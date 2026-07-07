@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sound Machine Pack Loader</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .loader {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 100%;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 15px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="loader">
+
+    <h1>Load Sound Pack</h1>
+
+
+    <label>
+        Select list.json:
+        <input type="file" id="jsonFile" accept=".json">
+    </label>
+
+
+    <label>
+        Select sounds.zip:
+        <input type="file" id="zipFile" accept=".zip">
+    </label>
+
+
+    <button id="loadButton">
+        Open Sound Machine
+    </button>
+
+</div>
+
+
+<script>
+
+const loadButton =
+    document.getElementById("loadButton");
+
+const jsonInput =
+    document.getElementById("jsonFile");
+
+const zipInput =
+    document.getElementById("zipFile");
+
+loadButton.disabled = true;
+
+
+// Completely remove the previous database
+const deleteRequest =
+    indexedDB.deleteDatabase("SoundMachine");
+
+
+deleteRequest.onsuccess = () => {
+
+    console.log(
+        "Previous sound pack deleted."
+    );
+
+    loadButton.disabled = false;
+
+};
+
+
+deleteRequest.onerror = () => {
+
+    console.error(
+        "Could not delete previous database."
+    );
+
+    loadButton.disabled = false;
+
+};
+
+
+deleteRequest.onblocked = () => {
+
+    alert(
+        "Please close any open Sound Machine tabs and refresh this page."
+    );
+
+};
+
+
+loadButton.onclick = async () => {
+
+    const jsonFile =
+        jsonInput.files[0];
+
+    const zipFile =
+        zipInput.files[0];
+
+    if (!jsonFile) {
+
+        alert(
+            "Please select list.json"
+        );
+
+        return;
+
+    }
+
+    const jsonText =
+        await jsonFile.text();
+
+    const config =
+        JSON.parse(jsonText);
+
+
+    const needsZip =
+        config.sounds.some(
+            sound => sound.location !== "online"
+        );
+
+
+    if (needsZip && !zipFile) {
+
+        alert(
+            "This sound pack requires sounds.zip"
+        );
+
+        return;
+
+    }
+
+    let zipBuffer = null;
+
+    if (zipFile) {
+
+        zipBuffer =
+            await zipFile.arrayBuffer();
+
+    }
+
+    savePack(
+        jsonText,
+        zipBuffer
+    );
+
+};
+
+
+function savePack(jsonText, zipBuffer) {
+
+    const request =
+        indexedDB.open(
+            "SoundMachine",
+            2
+        );
+
+
+    request.onupgradeneeded = event => {
+
+        const db =
+            event.target.result;
+
+        if (!db.objectStoreNames.contains("pack")) {
+
+            db.createObjectStore("pack");
+
+        }
+
+    };
+
+
+    request.onsuccess = event => {
+
+        const db =
+            event.target.result;
+
+
+        const transaction =
+            db.transaction(
+                "pack",
+                "readwrite"
+            );
+
+
+        const store =
+            transaction.objectStore("pack");
+
+
+        // Remove previous sound pack completely
+        store.clear();
+
+
+        // Save replacement pack
+        store.put(
+            jsonText,
+            "list"
+        );
+
+
+        // Only save zip if one exists
+        if (zipBuffer) {
+
+            store.put(
+                zipBuffer,
+                "zip"
+            );
+
+        }
+
+
+        store.put(
+            Date.now(),
+            "version"
+        );
+
+
+        transaction.oncomplete = () => {
+
+            console.log(
+                "Sound pack replaced successfully."
+            );
+
+
+            db.close();
+
+
+            window.location.href =
+                "SoundMachine.html";
+
+        };
+
+
+        transaction.onerror = () => {
+
+            alert(
+                "Could not replace sound pack."
+            );
+
+        };
+
+    };
+
+
+    request.onerror = () => {
+
+        alert(
+            "Could not open IndexedDB."
+        );
+
+    };
+
+}
+
+</script>
+
+
+</body>
+
+</html>

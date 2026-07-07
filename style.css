@@ -1,0 +1,135 @@
+/* General page styling */
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Heading */
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+/* Main sound list container */
+
+.sound-list {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    width: 800px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Individual sound */
+
+.sound-item {
+    display: grid;
+    grid-template-columns: 30px 180px 1fr 60px;
+    align-items: center;
+    column-gap: 10px;
+    margin: 12px 0;
+}
+
+/* Checkbox */
+
+.sound-item input[type="range"] {
+    width: 100%;
+}
+
+/* Name */
+
+.sound-item label {
+    margin: 0;
+}
+
+/* Slider */
+
+.sound-item input[type="range"] {
+    flex: 1;
+}
+
+/* Frequency display */
+
+.frequency {
+    width: 50px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Generator button */
+
+#toggleBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Running state */
+
+#toggleBtn.running {
+    background: #d9534f;
+    color: white;
+}
+
+/* Stopped state */
+
+#toggleBtn:not(.running) {
+    background: #5cb85c;
+    color: white;
+}
+
+/* Hover effect */
+
+#toggleBtn:hover {
+    filter: brightness(0.95);
+}
+
+@media (max-width: 600px) {
+
+    .sound-item {
+        grid-template-columns: 30px 1fr;
+        grid-template-areas:
+            "check label"
+            ". slider"
+            ". value";
+        row-gap: 6px;
+    }
+
+    .sound-item input[type="checkbox"] {
+        grid-area: check;
+    }
+
+    .sound-item label {
+        grid-area: label;
+    }
+
+    .sound-item input[type="range"] {
+        grid-area: slider;
+    }
+
+    .frequency {
+        grid-area: value;
+        text-align: left;
+    }
+}
+.volume-bar {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.volume-bar input[type="range"] {
+    flex: 1;
+}

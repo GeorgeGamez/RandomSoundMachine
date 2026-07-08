@@ -1,0 +1,25 @@
+{
+  "sounds": [
+    {
+      "name": "Doorbell",
+      "id": "doorbell",
+      "location": "local",
+      "type": "single",
+      "mode": "short",
+      "file": "testSounds/doorbell.mp3",
+      "defaultRate": 60
+    },
+    {
+      "name": "Error",
+      "id": "error",
+      "location": "local",
+      "type": "group",
+      "mode": "short",
+      "folder": "testSounds/error/",
+      "count": 2,
+      "extension": "mp3",
+      "digits": 2,
+      "defaultRate": 60
+    }
+  ]
+}
